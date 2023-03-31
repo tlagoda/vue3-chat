@@ -13,6 +13,8 @@
           [{{ message.name }}]: {{ message.text }}
         </div>
       </div>
+      <div v-if="typingDisplay">{{ typingDisplay }}</div>
+      <hr />
       <div class="typing-area">
         <form @submit.prevent="sendMessage">
           <label>Message:</label>
