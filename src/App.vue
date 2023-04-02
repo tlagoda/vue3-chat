@@ -6,23 +6,37 @@
         <form @submit.prevent="join">
           <label>Enter your name: </label>
           <input v-model="name" />
-          <button type="submit" :disabled="name.length < 3">Join! <span v-if="name.length >= 3">🚀</span></button>
+          <button type="submit" :disabled="name.length < 3">
+            Join! <span v-if="name.length >= 3">🚀</span>
+          </button>
         </form>
       </div>
       <h2>[#{{ name }}]</h2>
     </div>
-    <div v-else class="chat-container">
+    <div class="main-content" v-else>
       <div class="messages-container">
-        <div v-for="message in messages">
-          [#{{ message.name }}]: {{ message.text }}
+        <div
+          v-for="message in messages"
+          class="message"
+          :class="{
+            'current-user-messages': message.name === name,
+            'other-users-messages': message.name !== name,
+          }"
+        >
+          <span>[#{{ message.name }}]: </span>
+          <span>{{ message.text }}</span>
         </div>
       </div>
-      <div v-if="typingDisplay">{{ typingDisplay }}</div>
-      <hr />
+      <div v-if="typingDisplay" class="is-typing-div">
+        {{ typingDisplay }}
+      </div>
       <div class="typing-area">
         <form @submit.prevent="sendMessage">
-          <label>Message:</label>
-          <input v-model="messageText" @input="emitTyping" />
+          <div>
+            <label>[#{{ name }}] says: </label>
+            <input v-model="messageText" @input="emitTyping" />
+          </div>
+
           <button type="submit">Send</button>
         </form>
       </div>
@@ -39,7 +53,7 @@ const messages = ref([]);
 const messageText = ref("");
 const joined = ref(false);
 const name = ref("");
-const typingDisplay = "";
+const typingDisplay = ref("");
 
 onBeforeMount(() => {
   socket.emit("findAllMessages", {}, (response) => {
@@ -75,7 +89,6 @@ const sendMessage = () => {
   );
 };
 
-let timeout;
 const emitTyping = () => {
   socket.emit("typing", { isTyping: true });
 
@@ -161,5 +174,69 @@ const emitTyping = () => {
   text-align: center;
   color: white;
   font-size: 3rem;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+
+.messages-container {
+  width: 35vw;
+  height: 80vh;
+  margin: 2vh auto;
+  padding: 1vh 2vw;
+  border-radius: 2rem;
+  overflow: scroll;
+  border: 5px solid white;
+}
+
+.message {
+  margin: 1vh 0;
+  padding: 1vh 1vw;
+  font-size: 1.4rem;
+  color: white;
+  border-radius: 1rem;
+}
+
+.current-user-messages {
+  width: 55%;
+  margin-left: 45%;
+  background-color: #e67e22;
+  text-align: right;
+}
+
+.other-users-messages {
+  width: 55%;
+  margin-right: 45%;
+  text-align: left;
+  background-color: #34495e;
+}
+
+.typing-area {
+  margin: 1vh auto;
+  font-size: 1.5rem;
+}
+
+.typing-area form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.typing-area form input {
+  font-size: 1.5rem;
+}
+
+.typing-area button {
+  margin: 2vh 0;
+  padding: 1vh 0;
+  width: 40%;
+}
+
+.typing-area button:hover {
+  cursor: pointer;
 }
 </style>
