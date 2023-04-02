@@ -6,7 +6,7 @@
         <form @submit.prevent="join">
           <label>Enter your name: </label>
           <input v-model="name" />
-          <button type="submit">Join! 🚀</button>
+          <button type="submit" :disabled="name.length < 3">Join! <span v-if="name.length >= 3">🚀</span></button>
         </form>
       </div>
       <h2>[#{{ name }}]</h2>
